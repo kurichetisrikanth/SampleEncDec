@@ -12,6 +12,7 @@ import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
 
 import com.nimbusds.jose.EncryptionMethod;
 import com.nimbusds.jose.JOSEException;
@@ -31,7 +32,7 @@ import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
-public class SignEnc {
+public class SenderSignEnc {
 
 	private static SignedJWT signedJWT = null;
 
@@ -41,7 +42,7 @@ public class SignEnc {
 	private static PublicKey sender_publicKey;
 
 	static {
-		ClassLoader classLoader = SignEnc.class.getClassLoader();
+		ClassLoader classLoader = SenderSignEnc.class.getClassLoader();
 
 		File sender_pri_key_file = new File(classLoader.getResource("static/sender_pri_key.pem").getFile());
 		File rec_pub_key_file = new File(classLoader.getResource("static/rec_pub_key.pem").getFile());
@@ -66,24 +67,18 @@ public class SignEnc {
 
 		JWSSigner signer = new RSASSASigner(jwk);
 
-		JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
-				.subject("sender subject")
-				.issuer("sender")
-				.expirationTime(new Date(new Date().getTime() + 60 * 1000)).build();
-
-		String jsonStr = "{\n"
-				+ "    \"inquiryType\":\"GI\",\n"
-				+ "    \"globalId\":\"1002345678899\",\n"
-				+ "    \"functionalId\":\"ACCOUNTSUM\",\n"
-				+ "    \"unidId\":[\"PRD\", \"OMN\"]\n"
-				+ "}";
+		JWTClaimsSet claimsSet = null;
+		
 		try {
-			JSONObject json = (JSONObject) JSONObjectUtils.parse(jsonStr);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
+			//JSONObject json = (JSONObject) JSONObjectUtils.parse(payload);
+			claimsSet = new JWTClaimsSet.Builder()
+					.claim("reqBody", payload)
+					.subject("sender subject")
+					.issuer("sender")
+					.expirationTime(new Date(new Date().getTime() + 60 * 1000)).build();
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 		
 		signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS512).keyID(jwk.getKeyID()).build(), claimsSet);
 
@@ -94,6 +89,8 @@ public class SignEnc {
 		return signedJWT;
 
 	}
+	
+	
 
 	public static JWEObject encrypt(SignedJWT signedJWT) throws JOSEException {
 		JWEObject jweObject = new JWEObject(

@@ -4,13 +4,14 @@ import org.springframework.stereotype.Component;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.shaded.json.JSONObject;
 import com.nimbusds.jwt.JWTClaimsSet;
 //import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jwt.SignedJWT;
-import com.srikanth.encdec.controller.OCSReqResDTO;
-import com.srikanth.encdec.util.SignEnc;
-import com.srikanth.encdec.util.VerifyDec;
+import com.srikanth.encdec.util.SenderSignEnc;
+import com.srikanth.encdec.util.SenderVerifyDec;
+import com.srikanth.encdec.model.OCSReqResDTO;
+import com.srikanth.encdec.util.RecVerifyDec;
+import com.srikanth.encdec.util.ReceiverSignEnc;
 
 @Component
 public class EncDecService {
@@ -18,8 +19,8 @@ public class EncDecService {
 	public OCSReqResDTO getOCSReqRes(String request){
 		OCSReqResDTO dto = null;
 		try {
-			SignedJWT signedJWT = SignEnc.signing(request);
-			JWEObject jweObject = SignEnc.encrypt(signedJWT);
+			SignedJWT signedJWT = SenderSignEnc.signing(request);
+			JWEObject jweObject = SenderSignEnc.encrypt(signedJWT);
 			dto = getOCSReqResFormat(jweObject);
 		} catch (JOSEException e) {
 			e.printStackTrace();
@@ -43,21 +44,52 @@ public class EncDecService {
 	}
 	
 	public String processOCSRequest(OCSReqResDTO req) {
-		String subject = "";
+		String reqBody = "";
 		SignedJWT signedJWT;
 		try {
-			signedJWT = VerifyDec.decrypt_verify(req.toString());
+			signedJWT = RecVerifyDec.decrypt_verify(req.toString());
 			JWTClaimsSet obj = JWTClaimsSet.parse(signedJWT.getPayload().toJSONObject());
 			
 			if(signedJWT != null) {
-				subject = signedJWT.getJWTClaimsSet().getSubject();
+				reqBody = signedJWT.getJWTClaimsSet().getClaim("reqBody").toString();
 				
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return subject;
+		return reqBody;
 	}
+	
+	public OCSReqResDTO getMWRequest(String request){
+		OCSReqResDTO dto = null;
+		try {
+			SignedJWT signedJWT = ReceiverSignEnc.signing(request);
+			JWEObject jweObject = ReceiverSignEnc.encrypt(signedJWT);
+			dto = getOCSReqResFormat(jweObject);
+		} catch (JOSEException e) {
+			e.printStackTrace();
+		}
+		return dto;
+		
+	}
+	public String processMWResponse(OCSReqResDTO req) {
+		String reqBody = "";
+		SignedJWT signedJWT;
+		try {
+			signedJWT = SenderVerifyDec.decrypt_verify(req.toString());
+			JWTClaimsSet obj = JWTClaimsSet.parse(signedJWT.getPayload().toJSONObject());
+			
+			if(signedJWT != null) {
+				reqBody = signedJWT.getJWTClaimsSet().getClaim("reqBody").toString();
+				
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return reqBody;
+	}
+	
 
 }

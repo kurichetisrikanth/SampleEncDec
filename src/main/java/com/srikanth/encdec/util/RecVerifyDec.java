@@ -25,7 +25,7 @@ import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
-public class VerifyDec {
+public class RecVerifyDec {
 
 	private static SignedJWT signedJWT = null;
 
@@ -34,7 +34,7 @@ public class VerifyDec {
 	private static PublicKey sender_publicKey;
 
 	static {
-		ClassLoader classLoader = VerifyDec.class.getClassLoader();
+		ClassLoader classLoader = RecVerifyDec.class.getClassLoader();
 
 		File rec_pub_key_file = new File(classLoader.getResource("static/rec_pub_key.pem").getFile());
 

@@ -1,4 +1,4 @@
-package com.srikanth.encdec.controller;
+package com.srikanth.encdec.model;
 
 public class OCSReqResDTO {
 	
