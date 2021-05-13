@@ -20,7 +20,7 @@ public class EncDecController {
 	}
 	
 	@PostMapping(value="/rec-process-request")
-	public String recRequest(@RequestBody OCSReqResDTO req) {
+	public String processRequest(@RequestBody OCSReqResDTO req) {
 		return service.processOCSRequest(req);
 	}
 	
@@ -30,7 +30,7 @@ public class EncDecController {
 	}
 	
 	@PostMapping(value="/sender-process-response")
-	public String processMWResponse(@RequestBody OCSReqResDTO req) {
+	public String processResponse(@RequestBody OCSReqResDTO req) {
 		return service.processMWResponse(req);
 	}
 }
