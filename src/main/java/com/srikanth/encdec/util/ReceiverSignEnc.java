@@ -39,7 +39,7 @@ public class ReceiverSignEnc {
 		try {
 			JSONObject json = (JSONObject) JSONObjectUtils.parse(payload);
 			claimsSet = new JWTClaimsSet.Builder()
-					.claim("reqBody", json)
+					.claim("resBody", json)
 					.subject("sender subject")
 					.issuer("sender")
 					.expirationTime(new Date(new Date().getTime() + 60 * 1000)).build();

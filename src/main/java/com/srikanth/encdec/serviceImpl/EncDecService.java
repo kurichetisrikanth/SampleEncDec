@@ -81,7 +81,7 @@ public class EncDecService {
 			JWTClaimsSet obj = JWTClaimsSet.parse(signedJWT.getPayload().toJSONObject());
 			
 			if(signedJWT != null) {
-				reqBody = signedJWT.getJWTClaimsSet().getClaim("reqBody").toString();
+				reqBody = signedJWT.getJWTClaimsSet().getClaim("resBody").toString();
 				
 			}
 		} catch (Exception e) {
