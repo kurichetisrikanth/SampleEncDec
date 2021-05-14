@@ -2,7 +2,6 @@ package com.srikanth.encdec.util;
 
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.text.ParseException;
 import java.util.Date;
 
 import com.nimbusds.jose.EncryptionMethod;
@@ -17,8 +16,6 @@ import com.nimbusds.jose.Payload;
 import com.nimbusds.jose.crypto.RSAEncrypter;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jose.jwk.RSAKey;
-import com.nimbusds.jose.shaded.json.JSONObject;
-import com.nimbusds.jose.util.JSONObjectUtils;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 
@@ -36,16 +33,11 @@ public class ReceiverSignEnc {
 
 		JWTClaimsSet claimsSet = null;
 		
-		try {
-			JSONObject json = (JSONObject) JSONObjectUtils.parse(payload);
-			claimsSet = new JWTClaimsSet.Builder()
-					.claim("resBody", json)
-					.subject("sender subject")
-					.issuer("sender")
-					.expirationTime(new Date(new Date().getTime() + 60 * 1000)).build();
-		} catch (ParseException e) {
-			e.printStackTrace();
-		}
+		claimsSet = new JWTClaimsSet.Builder()
+				.claim("resBody", payload)
+				.subject("sender subject")
+				.issuer("sender")
+				.expirationTime(new Date(new Date().getTime() + 60 * 1000)).build();
 		
 		signedJWT = new SignedJWT(new JWSHeader.Builder(JWSAlgorithm.RS512).keyID(jwk.getKeyID()).build(), claimsSet);
 

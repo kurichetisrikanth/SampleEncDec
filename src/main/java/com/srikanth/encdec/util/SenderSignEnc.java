@@ -51,7 +51,7 @@ public class SenderSignEnc {
 	
 	public static JWEObject encrypt(SignedJWT signedJWT) throws JOSEException {
 		JWEObject jweObject = new JWEObject(
-				new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256CBC_HS512_DEPRECATED)
+				new JWEHeader.Builder(JWEAlgorithm.RSA_OAEP_256, EncryptionMethod.A256CBC_HS512)
 						.contentType("JWT") 
 						.build(),
 				new Payload(signedJWT));
