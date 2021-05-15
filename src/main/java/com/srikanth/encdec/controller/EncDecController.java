@@ -1,12 +1,17 @@
 package com.srikanth.encdec.controller;
 
+import java.security.NoSuchAlgorithmException;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.srikanth.encdec.model.OCSReqResDTO;
 import com.srikanth.encdec.serviceImpl.EncDecService;
+import com.srikanth.encdec.util.RSAUtils;
 
 @RestController
 public class EncDecController {
@@ -39,4 +44,16 @@ public class EncDecController {
 	public String processResponse(@RequestBody OCSReqResDTO req) {
 		return service.processMWResponse(req);
 	}
+	
+	@EventListener(ApplicationReadyEvent.class)
+	public void generateRSAKeys() {
+		try {
+			RSAUtils.generateKeys();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	
 }

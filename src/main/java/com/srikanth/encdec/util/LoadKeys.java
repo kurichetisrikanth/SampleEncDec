@@ -26,22 +26,45 @@ public class LoadKeys {
 		File sender_pub_key_file = new File(classLoader.getResource("static/sender_pub_key.pem").getFile());
 
 		try {
-			rec_publicKey = readPublicKey(rec_pub_key_file);
-			sender_privateKey = readPrivateKey(sender_pri_key_file);
-			rec_privateKey = readPrivateKey(rec_pri_key_file);
-			sender_publicKey = readPublicKey(sender_pub_key_file);
+			
+//			rec_publicKey = readPublicKey(rec_pub_key);
+//			sender_privateKey = readPrivateKey(sender_pri_key);
+//			rec_privateKey = readPrivateKey(rec_pri_key);
+//			sender_publicKey = readPublicKey(sender_pub_key);
+			
+			sender_privateKey = RSAUtils.getSenderPrivateKey();
+			rec_publicKey = RSAUtils.getRecPublicKey();
+			rec_privateKey = RSAUtils.getRecPrivateKey();
+			sender_publicKey = RSAUtils.getSenderPublicKey();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-	
+	public static RSAPublicKey readPublicKey(String publicKeyPEM) throws Exception {
+
+		
+		byte[] encoded = org.apache.commons.codec.binary.Base64.decodeBase64(publicKeyPEM);
+
+		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+		X509EncodedKeySpec keySpec = new X509EncodedKeySpec(encoded);
+		return (RSAPublicKey) keyFactory.generatePublic(keySpec);
+	}
+
+	public static RSAPrivateKey readPrivateKey(String privateKeyPEM) throws Exception {
+		
+		byte[] encoded = org.apache.commons.codec.binary.Base64.decodeBase64(privateKeyPEM);
+
+		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+		PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
+		return (RSAPrivateKey) keyFactory.generatePrivate(keySpec);
+	}
 	public static RSAPublicKey readPublicKey(File file) throws Exception {
 		String key = new String(Files.readAllBytes(file.toPath()), Charset.defaultCharset());
 
 		String publicKeyPEM = key.replace("-----BEGIN PUBLIC KEY-----", "").replaceAll(System.lineSeparator(), "")
 				.replace("-----END PUBLIC KEY-----", "");
-
 		byte[] encoded = org.apache.commons.codec.binary.Base64.decodeBase64(publicKeyPEM);
 
 		KeyFactory keyFactory = KeyFactory.getInstance("RSA");
