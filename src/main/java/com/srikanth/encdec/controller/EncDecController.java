@@ -5,6 +5,7 @@ import java.security.NoSuchAlgorithmException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,15 +46,21 @@ public class EncDecController {
 		return service.processMWResponse(req);
 	}
 	
+	@GetMapping(value="/pk")
+	public String getOCSPublicKey() {
+		return service.getOCSPublicKey();
+	}
+	
 	@EventListener(ApplicationReadyEvent.class)
 	public void generateRSAKeys() {
 		try {
 			RSAUtils.generateKeys();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
+	
+	
 	
 	
 }

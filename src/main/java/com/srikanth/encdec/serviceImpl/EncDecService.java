@@ -1,5 +1,7 @@
 package com.srikanth.encdec.serviceImpl;
 
+import java.util.Base64;
+
 import org.springframework.stereotype.Component;
 
 import com.nimbusds.jose.JOSEException;
@@ -10,6 +12,7 @@ import com.nimbusds.jwt.SignedJWT;
 import com.srikanth.encdec.util.SenderSignEnc;
 import com.srikanth.encdec.util.SenderVerifyDec;
 import com.srikanth.encdec.model.OCSReqResDTO;
+import com.srikanth.encdec.util.LoadKeys;
 import com.srikanth.encdec.util.RecVerifyDec;
 import com.srikanth.encdec.util.ReceiverSignEnc;
 
@@ -89,6 +92,11 @@ public class EncDecService {
 			e.printStackTrace();
 		}
 		return reqBody;
+	}
+
+
+	public String getOCSPublicKey() {
+		return Base64.getEncoder().encodeToString(LoadKeys.sender_publicKey.getEncoded());
 	}
 	
 
