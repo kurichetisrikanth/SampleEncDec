@@ -4,14 +4,15 @@ import org.springframework.stereotype.Component;
 
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jwt.JWTClaimsSet;
 //import com.nimbusds.jose.util.Base64;
 import com.nimbusds.jwt.SignedJWT;
-import com.srikanth.encdec.util.SenderSignEnc;
-import com.srikanth.encdec.util.SenderVerifyDec;
 import com.srikanth.encdec.model.OCSReqResDTO;
 import com.srikanth.encdec.util.RecVerifyDec;
 import com.srikanth.encdec.util.ReceiverSignEnc;
+import com.srikanth.encdec.util.SenderSignEnc;
+import com.srikanth.encdec.util.SenderVerifyDec;
 
 @Component
 public class EncDecService {
@@ -19,8 +20,8 @@ public class EncDecService {
 	public OCSReqResDTO getOCSReqRes(String request){
 		OCSReqResDTO dto = null;
 		try {
-			SignedJWT signedJWT = SenderSignEnc.signing(request);
-			JWEObject jweObject = SenderSignEnc.encrypt(signedJWT);
+			JWSObject jwsObject = SenderSignEnc.signing(request);
+			JWEObject jweObject = SenderSignEnc.encrypt(jwsObject);
 			dto = getOCSReqResFormat(jweObject);
 		} catch (JOSEException e) {
 			e.printStackTrace();
@@ -44,28 +45,14 @@ public class EncDecService {
 	}
 	
 	public String processOCSRequest(OCSReqResDTO req) {
-		String reqBody = "";
-		SignedJWT signedJWT;
-		try {
-			signedJWT = RecVerifyDec.decrypt_verify(req.toString());
-			JWTClaimsSet obj = JWTClaimsSet.parse(signedJWT.getPayload().toJSONObject());
-			
-			if(signedJWT != null) {
-				reqBody = signedJWT.getJWTClaimsSet().getClaim("reqBody").toString();
-				
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return reqBody;
+		return RecVerifyDec.decrypt_verify(req.toString());
 	}
 	
 	public OCSReqResDTO getMWRequest(String request){
 		OCSReqResDTO dto = null;
 		try {
-			SignedJWT signedJWT = ReceiverSignEnc.signing(request);
-			JWEObject jweObject = ReceiverSignEnc.encrypt(signedJWT);
+			JWSObject jwsObject = ReceiverSignEnc.signing(request);
+			JWEObject jweObject = ReceiverSignEnc.encrypt(jwsObject);
 			dto = getOCSReqResFormat(jweObject);
 		} catch (JOSEException e) {
 			e.printStackTrace();
@@ -74,22 +61,7 @@ public class EncDecService {
 		
 	}
 	public String processMWResponse(OCSReqResDTO req) {
-		String reqBody = "";
-		SignedJWT signedJWT;
-		try {
-			signedJWT = SenderVerifyDec.decrypt_verify(req.toString());
-			JWTClaimsSet obj = JWTClaimsSet.parse(signedJWT.getPayload().toJSONObject());
-			
-			if(signedJWT != null) {
-				reqBody = signedJWT.getJWTClaimsSet().getClaim("resBody").toString();
-				
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return reqBody;
+		return SenderVerifyDec.decrypt_verify(req.toString());
 	}
-	
 
 }
